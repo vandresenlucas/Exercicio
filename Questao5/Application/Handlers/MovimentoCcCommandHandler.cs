@@ -5,20 +5,35 @@ using Questao5.Domain.Entities.ContaCorrente;
 using Questao5.Domain.Entities.Idempotencia;
 using Questao5.Domain.Entities.Movimento;
 using Questao5.Domain.Enumerators;
+using Questao5.Infrastructure.Database.QueryStore.Requests;
 using System.Text.Json;
 
 namespace Questao5.Application.Handlers
 {
-    public class MovimentacaoCcCommandHandler : IRequestHandler<MovimentoCcCommand, MovimentoCcResponse>
+    public class MovimentoCcCommandHandler : IRequestHandler<MovimentoCcCommand, MovimentoCcResponse>
     {
         private readonly IIdempotenciaQueryStore _idempotenciaQueryStore;
         private readonly IContaCorrenteQueryStore _contaCorrenteQueryStore;
         private readonly IMovimentoCommandStore _movimentoCommandStore;
         private readonly IIdempotenciaCommandStore _idempotenciaCommandStore;
 
+        public MovimentoCcCommandHandler(IIdempotenciaQueryStore idempotenciaQueryStore, 
+            IContaCorrenteQueryStore contaCorrenteQueryStore, 
+            IMovimentoCommandStore movimentoCommandStore, 
+            IIdempotenciaCommandStore idempotenciaCommandStore)
+        {
+            _idempotenciaQueryStore = idempotenciaQueryStore;
+            _contaCorrenteQueryStore = contaCorrenteQueryStore;
+            _movimentoCommandStore = movimentoCommandStore;
+            _idempotenciaCommandStore = idempotenciaCommandStore;
+        }
+
         public async Task<MovimentoCcResponse> Handle(MovimentoCcCommand request, CancellationToken cancellationToken)
         {
-            var idempotencia = await _idempotenciaQueryStore.BuscarIdempotencia(request.ChaveIdempotencia);
+            Movimento movimento = request;
+            var idempotenciaRequest = new BuscarIdempotenciaRequest { ChaveIdempotencia = request.ChaveIdempotencia };
+            var idCcRequest = new BuscarContaCorrenteRequest { IdContaCorrente = request.IdContaCorrente };
+            var idempotencia = await _idempotenciaQueryStore.BuscarIdempotencia(idempotenciaRequest);
 
             if (idempotencia != null)
             {
@@ -26,7 +41,7 @@ namespace Questao5.Application.Handlers
                 return JsonSerializer.Deserialize<MovimentoCcResponse>(idempotencia.Resultado); //Verificar
             }
 
-            var cc = await _contaCorrenteQueryStore.BuscarContaCorrente(request.IdContaCorrente);
+            var cc = await _contaCorrenteQueryStore.BuscarContaCorrente(idCcRequest);
 
             if (cc == null) 
                 return new MovimentoCcResponse 
@@ -36,7 +51,7 @@ namespace Questao5.Application.Handlers
                     TipoErro = "INVALID_ACCOUNT" 
                 };
 
-            if (cc.Ativo)
+            if (!cc.Ativo)
                 return new MovimentoCcResponse 
                 { 
                     Sucesso = false, 
@@ -60,7 +75,7 @@ namespace Questao5.Application.Handlers
                     TipoErro = "INVALID_TYPE"
                 };
 
-            var movimento = await _movimentoCommandStore.RegistrarMovimento(request);
+            await _movimentoCommandStore.RegistrarMovimento(movimento);
 
             var response = new MovimentoCcResponse
             {

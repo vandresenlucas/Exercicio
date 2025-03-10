@@ -2,11 +2,10 @@
 using Questao5.Application.Commands.Requests;
 using Questao5.Application.Commands.Responses;
 using Questao5.Domain.Entities.Idempotencia;
-using Questao5.Infrastructure.Database.CommandStore.Responses;
 using System.Data;
 using System.Text.Json;
 
-namespace Questao5.Infrastructure.Database.CommandStore.Requests
+namespace Questao5.Infrastructure.Database.CommandStore
 {
     public class IdempotenciaCommandStore : IIdempotenciaCommandStore
     {
@@ -19,10 +18,11 @@ namespace Questao5.Infrastructure.Database.CommandStore.Requests
 
         public async Task RegistrarIdempotencia(string chaveIdempotencia, MovimentoCcCommand request, MovimentoCcResponse response)
         {
+            var query = "INSERT INTO idempotencia (chave_idempotencia, requisicao, resultado) VALUES (@Chave, @Requisicao, @Resultado)";
             var jsonRequest = JsonSerializer.Serialize(request);
             var jsonResponse = JsonSerializer.Serialize(response);
 
-            await _dbConnection.ExecuteAsync("INSERT INTO idempotencia (chave_idempotencia, requisicao, resultado) VALUES (@Chave, @Requisicao, @Resultado)",
+            await _dbConnection.ExecuteAsync(query,
                 new { Chave = chaveIdempotencia, Requisicao = jsonRequest, Resultado = jsonResponse });
         }
     }

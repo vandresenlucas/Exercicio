@@ -1,10 +1,11 @@
 ﻿using Dapper;
 using Questao5.Domain.Entities.Idempotencia;
+using Questao5.Infrastructure.Database.QueryStore.Requests;
 using Questao5.Infrastructure.Database.QueryStore.Responses;
 using System.Data;
 using System.Text.Json;
 
-namespace Questao5.Infrastructure.Database.QueryStore.Requests
+namespace Questao5.Infrastructure.Database.QueryStore
 {
     public class IdempotenciaQueryStore : IIdempotenciaQueryStore
     {
@@ -15,11 +16,10 @@ namespace Questao5.Infrastructure.Database.QueryStore.Requests
             _dbConnection = dbConnection;
         }
 
-        public async Task<IdempotenciaResponse?> BuscarIdempotencia(string chaveIdempotencia)
+        public async Task<IdempotenciaResponse?> BuscarIdempotencia(BuscarIdempotenciaRequest request)
         {
-            var result = await _dbConnection.QuerySingleOrDefaultAsync<string>(
-                "SELECT resultado FROM idempotencia WHERE chave_idempotencia = @Chave",
-            new { Chave = chaveIdempotencia });
+            var query = "SELECT resultado FROM idempotencia WHERE chave_idempotencia = @Chave";
+            var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query, new { Chave = request.ChaveIdempotencia });
 
             return result != null ? JsonSerializer.Deserialize<IdempotenciaResponse>(result) : null;
         }
