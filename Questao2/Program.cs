@@ -2,6 +2,9 @@
 
 public class Program
 {
+    private const string TEAM1 = "team1";
+    private const string TEAM2 = "team2";
+
     public static async Task Main()
     {
         string teamName = "Paris Saint-Germain";
@@ -32,22 +35,16 @@ public class Program
 
             while (currentPage <= totalPages)
             {
-                var apiUrl = $"https://jsonmock.hackerrank.com/api/football_matches?team1={team}&year={year}&page={currentPage}";
-
-                HttpResponseMessage response = await client.GetAsync(apiUrl);
+                var response = await GetInformations(TEAM1, team, year, currentPage);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string jsonResponse = await response.Content.ReadAsStringAsync();
-                    dynamic result = JsonConvert.DeserializeObject(jsonResponse);
+                    dynamic result = await GetObjectResult(response);
 
-                    if (currentPage == 1) 
+                    if (currentPage == 1)
                         totalPages = result.total_pages;
 
-                    foreach (var match in result.data)
-                    {
-                        totalGoals += int.Parse(match.team1goals.ToString());
-                    }
+                    totalGoals += GetTotalGoals(TEAM1, result);
                 }
                 else
                 {
@@ -55,19 +52,13 @@ public class Program
                     return 0;
                 }
 
-                apiUrl = $"https://jsonmock.hackerrank.com/api/football_matches?team2={team}&year={year}&page={currentPage}";
-
-                response = await client.GetAsync(apiUrl);
+                response = await GetInformations(TEAM2, team, year, currentPage);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string jsonResponse = await response.Content.ReadAsStringAsync();
-                    dynamic result = JsonConvert.DeserializeObject(jsonResponse);
+                    dynamic result = await GetObjectResult(response);
 
-                    foreach (var match in result.data)
-                    {
-                        totalGoals += int.Parse(match.team2goals.ToString());
-                    }
+                    totalGoals += GetTotalGoals(TEAM2, result);
                 }
                 else
                 {
@@ -81,4 +72,34 @@ public class Program
             return totalGoals;
         }
     }
+
+    private static int GetTotalGoals(string param, dynamic result)
+    {
+        var goals = 0;
+
+        foreach (var match in result.data)
+        {
+            goals += param == TEAM1 
+                ? int.Parse(match.team1goals.ToString())
+                : int.Parse(match.team2goals.ToString());
+        }
+
+        return goals;
+    }
+
+    private static async Task<dynamic> GetObjectResult(HttpResponseMessage response)
+    {
+        string jsonResponse = await response.Content.ReadAsStringAsync();
+        dynamic result = JsonConvert.DeserializeObject(jsonResponse);
+        return result;
+    }
+
+    private static async Task<HttpResponseMessage> GetInformations(string paramName, string team, int year, int currentPage)
+    {
+        var apiUrl = $"https://jsonmock.hackerrank.com/api/football_matches?{paramName}={team}&year={year}&page={currentPage}";
+
+        var client = new HttpClient();
+        return await client.GetAsync(apiUrl);
+    }
+
 }
