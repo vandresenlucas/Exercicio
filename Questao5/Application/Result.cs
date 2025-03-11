@@ -17,10 +17,10 @@ namespace Questao5.Application
         [SwaggerSchema(Description = "Objeto que contém a resposta da operação, se houver.")]
         public object? Response { get; set; }
 
-        public Result(bool sucesso = true, string? menssagem = null, string? tipoErro = null, object? response = null)
+        public Result(bool sucesso = true, string? mensagem = null, string? tipoErro = null, object? response = null)
         {
             Sucesso = sucesso;
-            Mensagem = menssagem;
+            Mensagem = mensagem;
             Response = response;
             TipoErro = tipoErro;
         }
