@@ -38,7 +38,6 @@
     <Folder Include="Application\Queries\Requests\" />
     <Folder Include="Application\Queries\Responses\" />
     <Folder Include="Infrastructure\Database\CommandStore\Responses\" />
-    <Folder Include="NovaPasta\" />
   </ItemGroup>
 
 </Project>

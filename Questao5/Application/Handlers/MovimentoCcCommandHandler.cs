@@ -36,10 +36,7 @@ namespace Questao5.Application.Handlers
             var idempotencia = await _idempotenciaQueryStore.BuscarIdempotenciaAsync(idempotenciaRequest);
 
             if (idempotencia != null)
-            {
-                var teste = JsonSerializer.Deserialize<MovimentoCcResponse>(idempotencia.Resultado);
-                return JsonSerializer.Deserialize<Result>(idempotencia.Resultado); //Verificar
-            }
+                return JsonSerializer.Deserialize<Result>(idempotencia.Resultado); 
 
             var contaValida = await _movimentoService.ValidarMovimento(request.IdContaCorrente);
 
