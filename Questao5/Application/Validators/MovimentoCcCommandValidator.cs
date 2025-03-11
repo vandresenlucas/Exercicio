@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Questao5.Application.Commands.Requests;
-using Questao5.Application.Errors;
 using Questao5.Domain.Enumerators;
 
 namespace Questao5.Application.Validators

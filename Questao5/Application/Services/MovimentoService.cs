@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Localization;
-using Questao5.Application.Errors;
 using Questao5.Domain.Entities.ContaCorrente;
 using Questao5.Domain.Enumerators;
 using Questao5.Domain.Language;
