@@ -1,6 +1,9 @@
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
+using Questao5.Application;
 using Questao5.Application.Commands.Requests;
 using Questao5.Application.Services;
 using Questao5.Application.Validators;
@@ -16,7 +19,13 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options => options.InvalidModelStateResponseFactory = context =>
+    {
+        var erro = context.ModelState.Values.FirstOrDefault().Errors.Select(e => e.ErrorMessage).FirstOrDefault();
+
+        return new BadRequestObjectResult(new Result(false, menssagem: erro));
+    });
 
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
@@ -42,6 +51,12 @@ builder.Services.AddScoped<IValidator<MovimentoCcCommand>, MovimentoCcCommandVal
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => c.EnableAnnotations());
 
+//Fluent Validation
+builder.Services.AddValidatorsFromAssemblyContaining<MovimentoCcCommandValidator>();
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddLocalization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -56,6 +71,14 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+var supportedCultures = new[] { "en-US", "pt-BR" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture("pt-BR")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
 
 // sqlite
 #pragma warning disable CS8602 // Dereference of a possibly null reference.

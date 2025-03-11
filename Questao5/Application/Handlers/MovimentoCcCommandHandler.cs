@@ -1,18 +1,16 @@
 ﻿using MediatR;
 using Questao5.Application.Commands.Requests;
 using Questao5.Application.Commands.Responses;
-using Questao5.Application.Errors;
 using Questao5.Application.Services;
 using Questao5.Domain.Entities.ContaCorrente;
 using Questao5.Domain.Entities.Idempotencia;
 using Questao5.Domain.Entities.Movimento;
-using Questao5.Domain.Enumerators;
 using Questao5.Infrastructure.Database.QueryStore.Requests;
 using System.Text.Json;
 
 namespace Questao5.Application.Handlers
 {
-    public class MovimentoCcCommandHandler : IRequestHandler<MovimentoCcCommand, MovimentoCcResponse>
+    public class MovimentoCcCommandHandler : IRequestHandler<MovimentoCcCommand, Result>
     {
         private readonly IIdempotenciaQueryStore _idempotenciaQueryStore;
         private readonly IMovimentoCommandStore _movimentoCommandStore;
@@ -31,7 +29,7 @@ namespace Questao5.Application.Handlers
             _movimentoService = movimentoService;
         }
 
-        public async Task<MovimentoCcResponse> Handle(MovimentoCcCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(MovimentoCcCommand request, CancellationToken cancellationToken)
         {
             Movimento movimento = request;
             var idempotenciaRequest = new BuscarIdempotenciaRequest { ChaveIdempotencia = request.ChaveIdempotencia };
@@ -40,7 +38,7 @@ namespace Questao5.Application.Handlers
             if (idempotencia != null)
             {
                 var teste = JsonSerializer.Deserialize<MovimentoCcResponse>(idempotencia.Resultado);
-                return JsonSerializer.Deserialize<MovimentoCcResponse>(idempotencia.Resultado); //Verificar
+                return JsonSerializer.Deserialize<Result>(idempotencia.Resultado); //Verificar
             }
 
             var contaValida = await _movimentoService.ValidarMovimento(request.IdContaCorrente);
@@ -48,29 +46,13 @@ namespace Questao5.Application.Handlers
             if (contaValida != null)
                 return contaValida;
 
-            if (request.Valor <= 0)
-                return new MovimentoCcResponse
-                {
-                    Sucesso = false,
-                    Mensagem = BusinessErrors.INVALID_VALUE,
-                    TipoErro = "INVALID_VALUE"
-                };
-
-            if(!Enum.IsDefined(typeof(TipoMovimento), request.TipoMovimento))
-                return new MovimentoCcResponse
-                {
-                    Sucesso = false,
-                    Mensagem = BusinessErrors.INVALID_TYPE,
-                    TipoErro = "INVALID_TYPE"
-                };
-
             await _movimentoCommandStore.RegistrarMovimentoAsync(movimento);
 
-            var response = new MovimentoCcResponse
+            var response = new Result
             {
                 Sucesso = true,
                 Mensagem = "Movimento registrado com sucesso!",
-                IdMovimento = movimento.IdMovimento
+                Response = new MovimentoCcResponse { IdMovimento = movimento.IdMovimento }
             };
 
             await _idempotenciaCommandStore.RegistrarIdempotenciaAsync(request.ChaveIdempotencia, request, response);

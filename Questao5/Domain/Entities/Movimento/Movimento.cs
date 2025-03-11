@@ -1,5 +1,4 @@
-﻿using Questao5.Domain.Enumerators;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Questao5.Domain.Entities.Movimento
 {

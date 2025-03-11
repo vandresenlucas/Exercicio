@@ -4,6 +4,6 @@ namespace Questao5.Application.Services
 {
     public interface IMovimentoService
     {
-        Task<MovimentoCcResponse> ValidarMovimento(string idContaCorrente);
+        Task<Result> ValidarMovimento(string idContaCorrente);
     }
 }

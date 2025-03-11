@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Questao5.Application;
 using Questao5.Application.Commands.Requests;
-using Questao5.Application.Commands.Responses;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
@@ -25,8 +25,8 @@ namespace Questao5.Infrastructure.Services.Controllers
             OperationId = "movimentar",
             Tags = new[] { "Movimentação de conta corrente" }
         )]
-        [ProducesResponseType(typeof(MovimentoCcResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(MovimentoCcResponse), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(Result), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Result), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> MovimentarConta([FromBody] MovimentoCcCommand command)
         {
             try
@@ -34,13 +34,13 @@ namespace Questao5.Infrastructure.Services.Controllers
                 var result = await _mediator.Send(command);
 
                 if (result.Sucesso)
-                    return Ok(new { movimentoId = result.IdMovimento });
+                    return Ok(result);
 
-                return BadRequest(new { mensagem = result.Mensagem, tipo = result.TipoErro });
+                return BadRequest(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return BadRequest(new Result(false, ex.Message));
             }
         }
     }

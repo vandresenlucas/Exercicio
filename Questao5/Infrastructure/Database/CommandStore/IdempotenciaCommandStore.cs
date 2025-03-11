@@ -1,6 +1,6 @@
 ﻿using Dapper;
+using Questao5.Application;
 using Questao5.Application.Commands.Requests;
-using Questao5.Application.Commands.Responses;
 using Questao5.Domain.Entities.Idempotencia;
 using System.Data;
 using System.Text.Json;
@@ -16,7 +16,7 @@ namespace Questao5.Infrastructure.Database.CommandStore
             _dbConnection = dbConnection;
         }
 
-        public async Task RegistrarIdempotenciaAsync(string chaveIdempotencia, MovimentoCcCommand request, MovimentoCcResponse response)
+        public async Task RegistrarIdempotenciaAsync(string chaveIdempotencia, MovimentoCcCommand request, Result response)
         {
             var query = "INSERT INTO idempotencia (chave_idempotencia, requisicao, resultado) VALUES (@Chave, @Requisicao, @Resultado)";
             var jsonRequest = JsonSerializer.Serialize(request);
