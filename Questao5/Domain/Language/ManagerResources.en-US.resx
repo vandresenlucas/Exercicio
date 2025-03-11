@@ -124,10 +124,10 @@
     <value>Idempotency key is mandatory!!</value>
   </data>
   <data name="INACTIVE_ACCOUNT" xml:space="preserve">
-    <value>Only active checking accounts can receive transactions!!</value>
+    <value>Only active checking accounts can perform this operation!!</value>
   </data>
   <data name="INVALID_ACCOUNT" xml:space="preserve">
-    <value>Only registered checking accounts can receive transactions!!</value>
+    <value>Only registered checking accounts can perform this operation!!</value>
   </data>
   <data name="INVALID_TYPE" xml:space="preserve">
     <value>Only “debit” or “credit” types can be accepted!!</value>

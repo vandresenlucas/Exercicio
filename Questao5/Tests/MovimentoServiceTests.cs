@@ -16,12 +16,13 @@ namespace Questao5.Tests
     {
         private readonly IContaCorrenteQueryStore _contaCorrenteQueryStore;
         private readonly Mock<IStringLocalizer<ManagerResources>> _localizerMock;
-        private readonly MovimentoService _movimentoService;
+        private readonly ContaCorrenteService _movimentoService;
 
         public MovimentoServiceTests()
         {
             // Criando mocks
             _contaCorrenteQueryStore = Substitute.For<IContaCorrenteQueryStore>();
+
             _localizerMock = new Mock<IStringLocalizer<ManagerResources>>();
 
             _localizerMock.Setup(l => l[BusinessErrorsEnum.INVALID_ACCOUNT.ToString()])
@@ -31,7 +32,7 @@ namespace Questao5.Tests
                 .Returns(new LocalizedString("INACTIVE_ACCOUNT", "Apenas contas correntes ativas podem receber movimentação!!"));
 
             // Inicializando o serviço com os mocks
-            _movimentoService = new MovimentoService(_contaCorrenteQueryStore, _localizerMock.Object);
+            _movimentoService = new ContaCorrenteService(_contaCorrenteQueryStore, _localizerMock.Object);
         }
 
         [Fact]
@@ -44,7 +45,7 @@ namespace Questao5.Tests
                 .Returns(Task.FromResult<BuscarContaCorrenteResponse>(null));
 
             // Act
-            var result = await _movimentoService.ValidarMovimento(idContaCorrente);
+            var result = await _movimentoService.ValidarContaCorrente(idContaCorrente);
 
             // Assert
             Assert.NotNull(result);
@@ -67,7 +68,7 @@ namespace Questao5.Tests
                 })); 
 
             //Act
-            var result = await _movimentoService.ValidarMovimento(contaCorrenteInativa.IdContaCorrente);
+            var result = await _movimentoService.ValidarContaCorrente(contaCorrenteInativa.IdContaCorrente);
 
             Assert.NotNull(result);
             Assert.False(result.Sucesso);
@@ -87,7 +88,7 @@ namespace Questao5.Tests
                 .Returns(Task.FromResult(contaCorrenteAtiva));
 
             //Act
-            var result = await _movimentoService.ValidarMovimento(idContaCorrente);
+            var result = await _movimentoService.ValidarContaCorrente(idContaCorrente);
 
             Assert.Null(result);
         }

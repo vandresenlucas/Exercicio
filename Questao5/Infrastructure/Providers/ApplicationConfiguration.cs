@@ -1,7 +1,4 @@
-﻿using FluentValidation;
-using Questao5.Application.Commands.Requests;
-using Questao5.Application.Services;
-using Questao5.Application.Validators;
+﻿using Questao5.Application.Services;
 using Questao5.Domain.Entities.ContaCorrente;
 using Questao5.Domain.Entities.Idempotencia;
 using Questao5.Domain.Entities.Movimento;
@@ -18,7 +15,8 @@ namespace Questao5.Infrastructure.Providers
             services.AddScoped<IIdempotenciaQueryStore, IdempotenciaQueryStore>();
             services.AddScoped<IContaCorrenteQueryStore, ContaCorrenteQueryStore>();
             services.AddScoped<IMovimentoCommandStore, MovimentoCommandStore>();
-            services.AddScoped<IMovimentoService, MovimentoService>();
+            services.AddScoped<IMovimentoQueryStore, MovimentoQueryStore>();
+            services.AddScoped<IContaCorrenteService, ContaCorrenteService>();
 
             return services;
         }

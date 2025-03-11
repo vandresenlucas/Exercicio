@@ -17,7 +17,7 @@ namespace Questao5.Infrastructure.Database.QueryStore
 
         public async Task<BuscarContaCorrenteResponse> BuscarContaCorrenteAsync(BuscarContaCorrenteRequest request)
         {
-            var query = "SELECT idcontacorrente, ativo FROM contacorrente WHERE idcontacorrente = @Id";
+            var query = "SELECT * FROM contacorrente WHERE idcontacorrente = @Id";
  
             return await _dbConnection.QueryFirstOrDefaultAsync<BuscarContaCorrenteResponse>(query, new { Id = request.IdContaCorrente });
         }

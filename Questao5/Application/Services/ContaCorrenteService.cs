@@ -6,18 +6,18 @@ using Questao5.Infrastructure.Database.QueryStore.Requests;
 
 namespace Questao5.Application.Services
 {
-    public class MovimentoService : IMovimentoService
+    public class ContaCorrenteService : IContaCorrenteService
     {
         private readonly IContaCorrenteQueryStore _contaCorrenteQueryStore;
         private readonly IStringLocalizer<ManagerResources> _localizer;
 
-        public MovimentoService(IContaCorrenteQueryStore contaCorrenteQueryStore, IStringLocalizer<ManagerResources> localizer)
+        public ContaCorrenteService(IContaCorrenteQueryStore contaCorrenteQueryStore, IStringLocalizer<ManagerResources> localizer)
         {
             _contaCorrenteQueryStore = contaCorrenteQueryStore;
             _localizer = localizer;
         }
 
-        public async Task<Result> ValidarMovimento(string idContaCorrente)
+        public async Task<Result> ValidarContaCorrente(string idContaCorrente)
         {
             var idCcRequest = new BuscarContaCorrenteRequest { IdContaCorrente = idContaCorrente };
 

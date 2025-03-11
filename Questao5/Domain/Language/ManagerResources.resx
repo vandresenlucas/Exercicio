@@ -124,10 +124,10 @@
     <value>Chave de idempotencia é obrigatória!!</value>
   </data>
   <data name="INACTIVE_ACCOUNT" xml:space="preserve">
-    <value>Apenas contas correntes ativas podem receber movimentação!!</value>
+    <value>Apenas contas correntes ativas podem realizar esta operação!!</value>
   </data>
   <data name="INVALID_ACCOUNT" xml:space="preserve">
-    <value>Apenas contas correntes cadastradas podem receber movimentação!!</value>
+    <value>Apenas contas correntes cadastradas podem realizar esta operação!!</value>
   </data>
   <data name="INVALID_TYPE" xml:space="preserve">
     <value>Apenas os tipos “débito” ou “crédito” podem ser aceitos!!</value>

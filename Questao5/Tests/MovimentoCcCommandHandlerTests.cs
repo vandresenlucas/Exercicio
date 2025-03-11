@@ -20,7 +20,7 @@ namespace Questao5.Tests
         private readonly IIdempotenciaQueryStore _idempotenciaQueryStore;
         private readonly IMovimentoCommandStore _movimentoCommandStore;
         private readonly IIdempotenciaCommandStore _idempotenciaCommandStore;
-        private readonly IMovimentoService _movimentoService;
+        private readonly IContaCorrenteService _movimentoService;
         private readonly MovimentoCcCommandHandler _handler;
 
         public MovimentoCcCommandHandlerTests()
@@ -28,7 +28,8 @@ namespace Questao5.Tests
             _idempotenciaQueryStore = Substitute.For<IIdempotenciaQueryStore>();
             _movimentoCommandStore = Substitute.For<IMovimentoCommandStore>();
             _idempotenciaCommandStore = Substitute.For<IIdempotenciaCommandStore>();
-            _movimentoService = Substitute.For<IMovimentoService>();
+            _movimentoService = Substitute.For<IContaCorrenteService>();
+
             _handler = new MovimentoCcCommandHandler(_idempotenciaQueryStore,
                                                      Substitute.For<IContaCorrenteQueryStore>(),
                                                      _movimentoCommandStore,
@@ -65,7 +66,7 @@ namespace Questao5.Tests
             var command = new MovimentoCcCommandBuilder().Build();
 
             _movimentoService
-                .ValidarMovimento(Arg.Any<string>())
+                .ValidarContaCorrente(Arg.Any<string>())
                 .Returns(Task.FromResult(new Result { Sucesso = false, Mensagem = "Conta corrente inválida" }));
 
             // Act
@@ -89,7 +90,7 @@ namespace Questao5.Tests
                 .Returns(Task.FromResult<IdempotenciaResponse>(null));  
 
             _movimentoService
-                .ValidarMovimento(Arg.Any<string>())
+                .ValidarContaCorrente(Arg.Any<string>())
                 .Returns(Task.FromResult<Result>(null)); 
 
             _movimentoCommandStore

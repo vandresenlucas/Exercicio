@@ -15,18 +15,18 @@ namespace Questao5.Application.Handlers
         private readonly IIdempotenciaQueryStore _idempotenciaQueryStore;
         private readonly IMovimentoCommandStore _movimentoCommandStore;
         private readonly IIdempotenciaCommandStore _idempotenciaCommandStore;
-        private readonly IMovimentoService _movimentoService;
+        private readonly IContaCorrenteService _contaCorrenteService;
 
         public MovimentoCcCommandHandler(IIdempotenciaQueryStore idempotenciaQueryStore,
             IContaCorrenteQueryStore contaCorrenteQueryStore,
             IMovimentoCommandStore movimentoCommandStore,
             IIdempotenciaCommandStore idempotenciaCommandStore,
-            IMovimentoService movimentoService)
+            IContaCorrenteService contaCorrenteService)
         {
             _idempotenciaQueryStore = idempotenciaQueryStore;
             _movimentoCommandStore = movimentoCommandStore;
             _idempotenciaCommandStore = idempotenciaCommandStore;
-            _movimentoService = movimentoService;
+            _contaCorrenteService = contaCorrenteService;
         }
 
         public async Task<Result> Handle(MovimentoCcCommand request, CancellationToken cancellationToken)
@@ -38,7 +38,7 @@ namespace Questao5.Application.Handlers
             if (idempotencia != null)
                 return JsonSerializer.Deserialize<Result>(idempotencia.Resultado); 
 
-            var contaValida = await _movimentoService.ValidarMovimento(request.IdContaCorrente);
+            var contaValida = await _contaCorrenteService.ValidarContaCorrente(request.IdContaCorrente);
 
             if (contaValida != null)
                 return contaValida;
@@ -47,9 +47,8 @@ namespace Questao5.Application.Handlers
 
             var response = new Result
             {
-                Sucesso = true,
                 Mensagem = "Movimento registrado com sucesso!",
-                Response = new MovimentoCcResponse { IdMovimento = movimento.IdMovimento }
+                Response = new MovimentoCcCommandResponse { IdMovimento = movimento.IdMovimento }
             };
 
             await _idempotenciaCommandStore.RegistrarIdempotenciaAsync(request.ChaveIdempotencia, request, response);

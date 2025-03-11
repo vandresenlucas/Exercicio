@@ -7,6 +7,8 @@ namespace Questao5.Application.Commands.Requests
     [SwaggerSchema(Description = "Representa os dados para adicionar uma movimentação.")]
     public class MovimentoCcCommand : IRequest<Result>
     {
+        private string _tipoMovimento;
+
         [SwaggerSchema("Identificação da requisição.")]
         public string ChaveIdempotencia { get; set; }
 
@@ -17,7 +19,11 @@ namespace Questao5.Application.Commands.Requests
         public decimal Valor { get; set; }
 
         [SwaggerSchema("tipo da movimentação (C = Credito, D = Débito)")]
-        public string TipoMovimento { get; set; }
+        public string TipoMovimento
+        {
+            get => _tipoMovimento;
+            set => _tipoMovimento = value?.ToUpper();
+        }
 
         public static implicit operator Movimento(MovimentoCcCommand command)
         {
