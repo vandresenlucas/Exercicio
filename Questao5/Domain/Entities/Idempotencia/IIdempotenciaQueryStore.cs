@@ -5,6 +5,6 @@ namespace Questao5.Domain.Entities.Idempotencia
 {
     public interface IIdempotenciaQueryStore
     {
-        Task<IdempotenciaResponse> BuscarIdempotencia(BuscarIdempotenciaRequest request);
+        Task<IdempotenciaResponse> BuscarIdempotenciaAsync(BuscarIdempotenciaRequest request);
     }
 }

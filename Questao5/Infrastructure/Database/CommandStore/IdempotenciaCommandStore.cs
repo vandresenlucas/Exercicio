@@ -16,7 +16,7 @@ namespace Questao5.Infrastructure.Database.CommandStore
             _dbConnection = dbConnection;
         }
 
-        public async Task RegistrarIdempotencia(string chaveIdempotencia, MovimentoCcCommand request, MovimentoCcResponse response)
+        public async Task RegistrarIdempotenciaAsync(string chaveIdempotencia, MovimentoCcCommand request, MovimentoCcResponse response)
         {
             var query = "INSERT INTO idempotencia (chave_idempotencia, requisicao, resultado) VALUES (@Chave, @Requisicao, @Resultado)";
             var jsonRequest = JsonSerializer.Serialize(request);

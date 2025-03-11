@@ -16,7 +16,7 @@ namespace Questao5.Infrastructure.Database.QueryStore
             _dbConnection = dbConnection;
         }
 
-        public async Task<IdempotenciaResponse?> BuscarIdempotencia(BuscarIdempotenciaRequest request)
+        public async Task<IdempotenciaResponse?> BuscarIdempotenciaAsync(BuscarIdempotenciaRequest request)
         {
             var query = "SELECT resultado FROM idempotencia WHERE chave_idempotencia = @Chave";
             var result = await _dbConnection.QueryFirstOrDefaultAsync<string>(query, new { Chave = request.ChaveIdempotencia });

@@ -1,5 +1,9 @@
+using FluentValidation;
 using MediatR;
 using Microsoft.Data.Sqlite;
+using Questao5.Application.Commands.Requests;
+using Questao5.Application.Services;
+using Questao5.Application.Validators;
 using Questao5.Domain.Entities.ContaCorrente;
 using Questao5.Domain.Entities.Idempotencia;
 using Questao5.Domain.Entities.Movimento;
@@ -31,11 +35,12 @@ builder.Services.AddScoped<IIdempotenciaCommandStore, IdempotenciaCommandStore>(
 builder.Services.AddScoped<IIdempotenciaQueryStore, IdempotenciaQueryStore>();
 builder.Services.AddScoped<IContaCorrenteQueryStore, ContaCorrenteQueryStore>();
 builder.Services.AddScoped<IMovimentoCommandStore, MovimentoCommandStore>();
-
+builder.Services.AddScoped<IMovimentoService, MovimentoService>();
+builder.Services.AddScoped<IValidator<MovimentoCcCommand>, MovimentoCcCommandValidator>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c => c.EnableAnnotations());
 
 var app = builder.Build();
 

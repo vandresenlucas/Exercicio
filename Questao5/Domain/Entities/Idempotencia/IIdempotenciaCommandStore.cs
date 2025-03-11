@@ -5,6 +5,6 @@ namespace Questao5.Domain.Entities.Idempotencia
 {
     public interface IIdempotenciaCommandStore
     {
-        Task RegistrarIdempotencia(string chaveIdempotencia, MovimentoCcCommand request, MovimentoCcResponse response);
+        Task RegistrarIdempotenciaAsync(string chaveIdempotencia, MovimentoCcCommand request, MovimentoCcResponse response);
     }
 }

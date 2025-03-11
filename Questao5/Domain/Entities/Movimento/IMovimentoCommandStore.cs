@@ -4,6 +4,6 @@ namespace Questao5.Domain.Entities.Movimento
 {
     public interface IMovimentoCommandStore
     {
-        Task RegistrarMovimento(Movimento movimento);
+        Task RegistrarMovimentoAsync(Movimento movimento);
     }
 }

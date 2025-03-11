@@ -13,7 +13,7 @@ namespace Questao5.Infrastructure.Database.CommandStore
             _dbConnection = dbConnection;
         }
 
-        public async Task RegistrarMovimento(Movimento movimento)
+        public async Task RegistrarMovimentoAsync(Movimento movimento)
         {
             var query = @"INSERT INTO movimento (datamovimento, valor, idmovimento, tipomovimento, idcontacorrente) 
                 VALUES (@DataMovimento, @Valor, @IdMovimento, @TipoMovimento, @IdContaCorrente)";

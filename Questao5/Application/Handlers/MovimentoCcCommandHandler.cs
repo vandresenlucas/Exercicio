@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Questao5.Application.Commands.Requests;
 using Questao5.Application.Commands.Responses;
+using Questao5.Application.Errors;
+using Questao5.Application.Services;
 using Questao5.Domain.Entities.ContaCorrente;
 using Questao5.Domain.Entities.Idempotencia;
 using Questao5.Domain.Entities.Movimento;
@@ -13,27 +15,27 @@ namespace Questao5.Application.Handlers
     public class MovimentoCcCommandHandler : IRequestHandler<MovimentoCcCommand, MovimentoCcResponse>
     {
         private readonly IIdempotenciaQueryStore _idempotenciaQueryStore;
-        private readonly IContaCorrenteQueryStore _contaCorrenteQueryStore;
         private readonly IMovimentoCommandStore _movimentoCommandStore;
         private readonly IIdempotenciaCommandStore _idempotenciaCommandStore;
+        private readonly IMovimentoService _movimentoService;
 
-        public MovimentoCcCommandHandler(IIdempotenciaQueryStore idempotenciaQueryStore, 
-            IContaCorrenteQueryStore contaCorrenteQueryStore, 
-            IMovimentoCommandStore movimentoCommandStore, 
-            IIdempotenciaCommandStore idempotenciaCommandStore)
+        public MovimentoCcCommandHandler(IIdempotenciaQueryStore idempotenciaQueryStore,
+            IContaCorrenteQueryStore contaCorrenteQueryStore,
+            IMovimentoCommandStore movimentoCommandStore,
+            IIdempotenciaCommandStore idempotenciaCommandStore,
+            IMovimentoService movimentoService)
         {
             _idempotenciaQueryStore = idempotenciaQueryStore;
-            _contaCorrenteQueryStore = contaCorrenteQueryStore;
             _movimentoCommandStore = movimentoCommandStore;
             _idempotenciaCommandStore = idempotenciaCommandStore;
+            _movimentoService = movimentoService;
         }
 
         public async Task<MovimentoCcResponse> Handle(MovimentoCcCommand request, CancellationToken cancellationToken)
         {
             Movimento movimento = request;
             var idempotenciaRequest = new BuscarIdempotenciaRequest { ChaveIdempotencia = request.ChaveIdempotencia };
-            var idCcRequest = new BuscarContaCorrenteRequest { IdContaCorrente = request.IdContaCorrente };
-            var idempotencia = await _idempotenciaQueryStore.BuscarIdempotencia(idempotenciaRequest);
+            var idempotencia = await _idempotenciaQueryStore.BuscarIdempotenciaAsync(idempotenciaRequest);
 
             if (idempotencia != null)
             {
@@ -41,29 +43,16 @@ namespace Questao5.Application.Handlers
                 return JsonSerializer.Deserialize<MovimentoCcResponse>(idempotencia.Resultado); //Verificar
             }
 
-            var cc = await _contaCorrenteQueryStore.BuscarContaCorrente(idCcRequest);
+            var contaValida = await _movimentoService.ValidarMovimento(request.IdContaCorrente);
 
-            if (cc == null) 
-                return new MovimentoCcResponse 
-                { 
-                    Sucesso = false,
-                    Mensagem = "Conta corrente não encontrada.", 
-                    TipoErro = "INVALID_ACCOUNT" 
-                };
-
-            if (!cc.Ativo)
-                return new MovimentoCcResponse 
-                { 
-                    Sucesso = false, 
-                    Mensagem = "Conta corrente inativa.", 
-                    TipoErro = "INACTIVE_ACCOUNT" 
-                };
+            if (contaValida != null)
+                return contaValida;
 
             if (request.Valor <= 0)
                 return new MovimentoCcResponse
                 {
                     Sucesso = false,
-                    Mensagem = "Valor inválido.",
+                    Mensagem = BusinessErrors.INVALID_VALUE,
                     TipoErro = "INVALID_VALUE"
                 };
 
@@ -71,11 +60,11 @@ namespace Questao5.Application.Handlers
                 return new MovimentoCcResponse
                 {
                     Sucesso = false,
-                    Mensagem = "Tipo da conta inválido.",
+                    Mensagem = BusinessErrors.INVALID_TYPE,
                     TipoErro = "INVALID_TYPE"
                 };
 
-            await _movimentoCommandStore.RegistrarMovimento(movimento);
+            await _movimentoCommandStore.RegistrarMovimentoAsync(movimento);
 
             var response = new MovimentoCcResponse
             {
@@ -84,7 +73,7 @@ namespace Questao5.Application.Handlers
                 IdMovimento = movimento.IdMovimento
             };
 
-            await _idempotenciaCommandStore.RegistrarIdempotencia(request.ChaveIdempotencia, request, response);
+            await _idempotenciaCommandStore.RegistrarIdempotenciaAsync(request.ChaveIdempotencia, request, response);
 
             return response;
         }

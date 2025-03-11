@@ -5,6 +5,6 @@ namespace Questao5.Domain.Entities.ContaCorrente
 {
     public interface IContaCorrenteQueryStore
     {
-        Task<BuscarContaCorrenteResponse> BuscarContaCorrente(BuscarContaCorrenteRequest request);
+        Task<BuscarContaCorrenteResponse> BuscarContaCorrenteAsync(BuscarContaCorrenteRequest request);
     }
 }
